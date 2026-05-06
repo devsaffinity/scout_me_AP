@@ -17,6 +17,7 @@ const defaultNotifications = [
     type: "warning",
     title: "Verification queue growing",
     message: "18 new athlete verification requests are waiting for review.",
+    route: "/users-profiles",
     createdAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
     read: false,
   },
@@ -26,6 +27,7 @@ const defaultNotifications = [
     title: "Subscription sync completed",
     message:
       "Premium subscription data synced successfully from the billing provider.",
+    route: "/premium-nfc",
     createdAt: new Date(Date.now() - 1000 * 60 * 55).toISOString(),
     read: false,
   },
@@ -35,6 +37,7 @@ const defaultNotifications = [
     title: "New export ready",
     message:
       "The weekly analytics report has been generated and is ready to download.",
+    route: "/dashboard",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
     read: true,
   },
@@ -44,6 +47,7 @@ const defaultNotifications = [
     title: "Scan endpoint retry detected",
     message:
       "One NFC scan endpoint required an automatic retry during the last hour.",
+    route: "/premium-nfc",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString(),
     read: false,
   },
@@ -108,6 +112,7 @@ export const NotificationProvider = ({ children }) => {
       type: notification.type || "info",
       title: notification.title || "Notification",
       message: notification.message || "",
+      route: notification.route || "",
       createdAt: notification.createdAt || new Date().toISOString(),
       read: notification.read ?? false,
     };

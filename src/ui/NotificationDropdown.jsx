@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FiBell,
   FiCheck,
@@ -9,6 +10,7 @@ import {
   FiX,
 } from 'react-icons/fi';
 import { useNotifications } from '../context/NotificationContext';
+import { ROUTES } from '../routes/routes.constants';
 
 const typeIconMap = {
   success: FiCheckCircle,
@@ -43,18 +45,44 @@ const formatRelativeTime = (dateValue) => {
 
 const joinClasses = (...classes) => classes.filter(Boolean).join(' ');
 
+const resolveNotificationRoute = (notification) => {
+  if (notification.route) return notification.route;
+
+  const text = `${notification.title || ''} ${notification.message || ''}`.toLowerCase();
+
+  if (/(profile|password|account details)/.test(text)) return ROUTES.PROFILE_SETTINGS;
+  if (/(athlete|recruiter|verification|applicant|user)/.test(text)) return ROUTES.USERS_PROFILES;
+  if (/(discovery|engagement|surface|profile views|recommendation)/.test(text)) return ROUTES.DISCOVERY_ENGAGEMENT;
+  if (/(message|messaging|notification|campaign|conversation|moderation|template|delivery|filter|case)/.test(text)) {
+    return ROUTES.MESSAGING_NOTIFICATIONS;
+  }
+  if (/(premium|nfc|bracelet|subscription|billing|scan|plan)/.test(text)) return ROUTES.PREMIUM_NFC;
+
+  return ROUTES.DASHBOARD;
+};
+
 const NotificationRow = ({
   notification,
   onMarkRead,
   onRemove,
+  onOpen,
 }) => {
   const Icon = typeIconMap[notification.type] || FiBell;
   const iconClass = typeStylesMap[notification.type] || typeStylesMap.info;
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(notification)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onOpen(notification);
+        }
+      }}
       className={joinClasses(
-        'rounded-2xl border p-3 transition',
+        'cursor-pointer rounded-2xl border p-3 text-left transition hover:border-slate-300 hover:bg-white hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-300',
         notification.read
           ? 'border-slate-200 bg-white'
           : 'border-violet-200 bg-violet-50/50',
@@ -90,7 +118,10 @@ const NotificationRow = ({
               {!notification.read ? (
                 <button
                   type="button"
-                  onClick={() => onMarkRead(notification.id)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onMarkRead(notification.id);
+                  }}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white hover:text-slate-900"
                   aria-label="Mark notification as read"
                   title="Mark as read"
@@ -101,7 +132,10 @@ const NotificationRow = ({
 
               <button
                 type="button"
-                onClick={() => onRemove(notification.id)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onRemove(notification.id);
+                }}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white hover:text-rose-600"
                 aria-label="Remove notification"
                 title="Remove"
@@ -121,6 +155,7 @@ const NotificationDropdown = ({
   onClose,
   anchorRef,
 }) => {
+  const navigate = useNavigate();
   const panelRef = useRef(null);
   const [mobileLayout, setMobileLayout] = useState(null);
   const {
@@ -136,6 +171,12 @@ const NotificationDropdown = ({
     () => notifications.slice(0, 8),
     [notifications],
   );
+
+  const handleOpenNotification = (notification) => {
+    markAsRead(notification.id);
+    navigate(resolveNotificationRoute(notification));
+    onClose?.();
+  };
 
   useEffect(() => {
     if (!open) return undefined;
@@ -265,6 +306,7 @@ const NotificationDropdown = ({
               notification={notification}
               onMarkRead={markAsRead}
               onRemove={removeNotification}
+              onOpen={handleOpenNotification}
             />
           ))}
         </div>

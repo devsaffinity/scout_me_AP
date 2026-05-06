@@ -129,40 +129,25 @@ const PremiumNfcPage = () => {
   const scansPageSize = defaultScansPageSize;
 
   const totalPlansPages = Math.max(1, Math.ceil(planItems.length / plansPageSize));
+  const safePlansPage = Math.min(currentPlansPage, totalPlansPages);
   const paginatedPlans = useMemo(() => {
-    const startIndex = (currentPlansPage - 1) * plansPageSize;
+    const startIndex = (safePlansPage - 1) * plansPageSize;
     return planItems.slice(startIndex, startIndex + plansPageSize);
-  }, [currentPlansPage, planItems, plansPageSize]);
+  }, [planItems, plansPageSize, safePlansPage]);
 
   const totalInventoryPages = Math.max(1, Math.ceil(inventoryItems.length / inventoryPageSize));
+  const safeInventoryPage = Math.min(currentInventoryPage, totalInventoryPages);
   const paginatedInventory = useMemo(() => {
-    const startIndex = (currentInventoryPage - 1) * inventoryPageSize;
+    const startIndex = (safeInventoryPage - 1) * inventoryPageSize;
     return inventoryItems.slice(startIndex, startIndex + inventoryPageSize);
-  }, [currentInventoryPage, inventoryItems, inventoryPageSize]);
+  }, [inventoryItems, inventoryPageSize, safeInventoryPage]);
 
   const totalScansPages = Math.max(1, Math.ceil(scanItems.length / scansPageSize));
+  const safeScansPage = Math.min(currentScansPage, totalScansPages);
   const paginatedScans = useMemo(() => {
-    const startIndex = (currentScansPage - 1) * scansPageSize;
+    const startIndex = (safeScansPage - 1) * scansPageSize;
     return scanItems.slice(startIndex, startIndex + scansPageSize);
-  }, [currentScansPage, scanItems, scansPageSize]);
-
-  useEffect(() => {
-    if (currentPlansPage > totalPlansPages) {
-      setCurrentPlansPage(totalPlansPages);
-    }
-  }, [currentPlansPage, totalPlansPages]);
-
-  useEffect(() => {
-    if (currentInventoryPage > totalInventoryPages) {
-      setCurrentInventoryPage(totalInventoryPages);
-    }
-  }, [currentInventoryPage, totalInventoryPages]);
-
-  useEffect(() => {
-    if (currentScansPage > totalScansPages) {
-      setCurrentScansPage(totalScansPages);
-    }
-  }, [currentScansPage, totalScansPages]);
+  }, [safeScansPage, scanItems, scansPageSize]);
 
   const handleCreatePlan = (event) => {
     event.preventDefault();
@@ -223,14 +208,14 @@ const PremiumNfcPage = () => {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="grid w-full grid-cols-1 gap-3 sm:w-auto sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => {
                   setPlanComposerOpen((current) => !current);
                   setBraceletComposerOpen(false);
                 }}
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+                className="inline-flex min-w-40 justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
               >
                 Add plan
               </button>
@@ -240,7 +225,7 @@ const PremiumNfcPage = () => {
                   setBraceletComposerOpen((current) => !current);
                   setPlanComposerOpen(false);
                 }}
-                className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-lg"
+                className="inline-flex min-w-40 justify-center rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-lg"
               >
                 Assign bracelet
               </button>
@@ -437,7 +422,7 @@ const PremiumNfcPage = () => {
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
               <div className="flex justify-end">
-                <Pagination page={currentPlansPage} totalPages={totalPlansPages} onPageChange={setCurrentPlansPage} />
+                <Pagination page={safePlansPage} totalPages={totalPlansPages} onPageChange={setCurrentPlansPage} />
               </div>
             </div>
           </section>
@@ -466,7 +451,7 @@ const PremiumNfcPage = () => {
             <div className="mt-4 border-t border-slate-200 pt-4">
               <div className="flex justify-end">
                 <Pagination
-                  page={currentInventoryPage}
+                  page={safeInventoryPage}
                   totalPages={totalInventoryPages}
                   onPageChange={setCurrentInventoryPage}
                 />
@@ -505,7 +490,7 @@ const PremiumNfcPage = () => {
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
               <div className="flex justify-end">
-                <Pagination page={currentScansPage} totalPages={totalScansPages} onPageChange={setCurrentScansPage} />
+                <Pagination page={safeScansPage} totalPages={totalScansPages} onPageChange={setCurrentScansPage} />
               </div>
             </div>
           </section>

@@ -19,16 +19,16 @@ const PremiumConversionChart = ({ data = [], subtitle = '' }) => {
         <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
       </div>
 
-      <div className="h-[320px] w-full">
+      <div className="h-[280px] w-full 2xl:h-[320px]">
         <BarChart
           data={data}
           responsive
           style={{ width: '100%', height: '100%' }}
-          margin={{ top: 12, right: 12, left: -8, bottom: 0 }}
+          margin={{ top: 12, right: 12, left: 8, bottom: 0 }}
         >
           <CartesianGrid vertical={false} stroke="#e2e8f0" strokeDasharray="4 4" />
           <XAxis dataKey="label" tickLine={false} axisLine={false} />
-          <YAxis tickLine={false} axisLine={false} width={48} />
+          <YAxis tickLine={false} axisLine={false} width={60} tickMargin={10} />
           <Tooltip
             contentStyle={{
               borderRadius: 16,

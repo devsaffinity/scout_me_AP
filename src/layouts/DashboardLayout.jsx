@@ -31,14 +31,14 @@ const DashboardLayout = ({
 
           <main
             className={joinClasses(
-              "min-h-[calc(100vh-132px)] flex-1 px-4 pb-10 pt-4 md:px-6 md:pb-12 lg:px-8 lg:pt-6 xl:pb-8",
+              "min-h-[calc(100vh-132px)] flex-1 px-3 pb-8 pt-3 sm:px-4 md:px-5 md:pb-10 lg:px-6 lg:pt-5 2xl:px-8 2xl:pb-8",
               collapsed
-                ? "xl:max-w-[calc(100vw-96px)]"
-                : "xl:max-w-[calc(100vw-288px)]",
+                ? "xl:max-w-[calc(100vw-88px)] 2xl:max-w-[calc(100vw-96px)]"
+                : "xl:max-w-[calc(100vw-260px)] 2xl:max-w-[calc(100vw-288px)]",
               contentClassName,
             )}
           >
-            <div className="mx-auto w-full max-w-400">
+            <div className="mx-auto w-full max-w-full">
               {children || <Outlet />}
             </div>
           </main>

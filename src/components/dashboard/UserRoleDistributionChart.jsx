@@ -13,8 +13,8 @@ const UserRoleDistributionChart = ({ data = [] }) => {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
-        <div className="h-[280px] w-full">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_200px] lg:items-center 2xl:grid-cols-[minmax(0,1fr)_220px] 2xl:gap-6">
+        <div className="h-[240px] w-full 2xl:h-[280px]">
           <PieChart responsive style={{ width: '100%', height: '100%' }}>
             <Pie
               data={data}

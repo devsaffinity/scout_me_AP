@@ -4,6 +4,7 @@ import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { dashboardNavigationSections } from '../routes/navigation.config';
 import { useSidebar } from '../context/SidebarContext';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const defaultNavigationSections = dashboardNavigationSections;
 
 const joinClasses = (...classes) => classes.filter(Boolean).join(' ');
@@ -42,7 +43,7 @@ const SidebarLink = ({ item, collapsed }) => {
       to={item.path}
       className={({ isActive: navActive }) =>
         joinClasses(
-          'group relative flex items-center gap-3 overflow-hidden rounded-2xl border px-3 py-3 text-sm font-medium transition-all duration-200',
+          'group relative flex items-center gap-3 overflow-hidden rounded-2xl border px-3 py-2.5 text-sm font-medium transition-all duration-200 2xl:py-3',
           collapsed ? 'justify-center' : 'justify-start',
           isActive || navActive
             ? 'border-cyan-400/20 bg-[linear-gradient(135deg,rgba(34,211,238,0.2),rgba(59,130,246,0.12),transparent)] text-white shadow-[0_22px_45px_-30px_rgba(34,211,238,0.9)]'
@@ -111,7 +112,7 @@ const Sidebar = ({
     <aside
       className={joinClasses(
         'sticky top-0 hidden h-screen shrink-0 border-r border-white/10 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.14),_transparent_20%),linear-gradient(180deg,rgba(8,18,37,0.98)_0%,rgba(8,15,31,0.98)_100%)] text-slate-100 shadow-[20px_0_60px_-42px_rgba(2,6,23,0.95)] backdrop-blur xl:flex',
-        collapsed ? 'w-[96px]' : 'w-[288px]',
+        collapsed ? 'w-[88px] 2xl:w-[96px]' : 'w-[260px] 2xl:w-[288px]',
         className,
       )}
     >

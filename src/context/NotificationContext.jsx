@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { emitToast } from "../hooks/useToast";
 
 const STORAGE_KEY = "scoutme_admin_notifications";
 
@@ -112,6 +113,11 @@ export const NotificationProvider = ({ children }) => {
     };
 
     setNotifications((current) => sortNotifications([newItem, ...current]));
+    emitToast({
+      type: newItem.type,
+      title: newItem.title,
+      message: newItem.message,
+    });
   };
 
   const seedNotifications = () => {

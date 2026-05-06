@@ -1,6 +1,7 @@
 import { Suspense, useMemo } from "react";
 import { useRoutes } from "react-router-dom";
 import "./App.css";
+import ToastViewport from "./components/shared/ToastViewport";
 import routeConfig from "./routes/routeConfig";
 
 function AppLoader() {
@@ -21,6 +22,7 @@ function App() {
   return (
     <div className="app-root page-fade-in">
       <Suspense fallback={<AppLoader />}>{routes}</Suspense>
+      <ToastViewport />
     </div>
   );
 }

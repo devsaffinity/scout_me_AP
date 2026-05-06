@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { createElement, useEffect, useMemo, useRef, useState } from 'react';
 import { FiCheck, FiCheckCircle, FiChevronDown, FiFilter, FiSearch, FiShield, FiUserCheck, FiUsers } from 'react-icons/fi';
 import Pagination from '../../components/shared/Pagination';
-import PageSizeControl from '../../components/shared/PageSizeControl';
 import ApproveVerificationModal from '../../components/usersProfiles/verification/ApproveVerificationModal';
 import RequestVerificationInfoModal from '../../components/usersProfiles/verification/RequestVerificationInfoModal';
 import VerificationDetailsDrawer from '../../components/usersProfiles/verification/VerificationDetailsDrawer';
@@ -186,7 +185,7 @@ const useCountUp = (target) => {
   return value;
 };
 
-const MetricCard = ({ title, value, icon: Icon, accent, hint }) => {
+const MetricCard = ({ title, value, icon, accent, hint }) => {
   const animatedValue = useCountUp(value);
 
   return (
@@ -198,7 +197,7 @@ const MetricCard = ({ title, value, icon: Icon, accent, hint }) => {
           <p className="mt-2 text-sm text-slate-500">{hint}</p>
         </div>
         <div className={`rounded-2xl ${accent} p-3 text-xl text-white`}>
-          <Icon />
+          {createElement(icon)}
         </div>
       </div>
     </div>
@@ -254,9 +253,9 @@ const UsersProfilesPage = () => {
   const [currentAthletesPage, setCurrentAthletesPage] = useState(1);
   const [currentRecruitersPage, setCurrentRecruitersPage] = useState(1);
   const [currentVerificationPage, setCurrentVerificationPage] = useState(1);
-  const [athletesPageSize, setAthletesPageSize] = useState(defaultAthletesPageSize);
-  const [recruitersPageSize, setRecruitersPageSize] = useState(defaultRecruitersPageSize);
-  const [verificationPageSize, setVerificationPageSize] = useState(defaultVerificationPageSize);
+  const athletesPageSize = defaultAthletesPageSize;
+  const recruitersPageSize = defaultRecruitersPageSize;
+  const verificationPageSize = defaultVerificationPageSize;
   const statusMenuRef = useRef(null);
 
   useEffect(() => {
@@ -379,8 +378,8 @@ const UsersProfilesPage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-[1600px] space-y-6">
+      <div className="min-h-screen bg-slate-50">
+        <div className="mx-auto max-w-full space-y-5 2xl:space-y-6">
         <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-[0_20px_70px_rgba(15,23,42,0.06)]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -520,21 +519,7 @@ const UsersProfilesPage = () => {
               </div>
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
-              <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="text-sm text-slate-500">
-                    Showing {filteredAthletes.length ? (currentAthletesPage - 1) * athletesPageSize + 1 : 0}
-                    -
-                    {Math.min(currentAthletesPage * athletesPageSize, filteredAthletes.length)} of {filteredAthletes.length} athletes
-                  </p>
-                  <PageSizeControl
-                    value={athletesPageSize}
-                    onChange={(value) => {
-                      setAthletesPageSize(value);
-                      setCurrentAthletesPage(1);
-                    }}
-                  />
-                </div>
+              <div className="flex justify-end">
                 <Pagination page={currentAthletesPage} totalPages={totalAthletesPages} onPageChange={setCurrentAthletesPage} />
               </div>
             </div>
@@ -580,21 +565,7 @@ const UsersProfilesPage = () => {
               </div>
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
-              <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="text-sm text-slate-500">
-                    Showing {filteredRecruiters.length ? (currentRecruitersPage - 1) * recruitersPageSize + 1 : 0}
-                    -
-                    {Math.min(currentRecruitersPage * recruitersPageSize, filteredRecruiters.length)} of {filteredRecruiters.length} recruiters
-                  </p>
-                  <PageSizeControl
-                    value={recruitersPageSize}
-                    onChange={(value) => {
-                      setRecruitersPageSize(value);
-                      setCurrentRecruitersPage(1);
-                    }}
-                  />
-                </div>
+              <div className="flex justify-end">
                 <Pagination page={currentRecruitersPage} totalPages={totalRecruitersPages} onPageChange={setCurrentRecruitersPage} />
               </div>
             </div>
@@ -608,7 +579,7 @@ const UsersProfilesPage = () => {
                 <p className="mt-1 text-sm text-slate-500">Resolve high-priority trust checks quickly and keep onboarding flowing.</p>
               </div>
               {filteredVerificationRequests.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
                   {paginatedVerificationRequests.map((item) => (
                     <article key={item.id} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
                       <div className="flex items-start justify-between gap-3">
@@ -655,21 +626,7 @@ const UsersProfilesPage = () => {
               )}
               {filteredVerificationRequests.length ? (
                 <div className="mt-4 border-t border-slate-200 pt-4">
-                  <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <p className="text-sm text-slate-500">
-                        Showing {filteredVerificationRequests.length ? (currentVerificationPage - 1) * verificationPageSize + 1 : 0}
-                        -
-                        {Math.min(currentVerificationPage * verificationPageSize, filteredVerificationRequests.length)} of {filteredVerificationRequests.length} requests
-                      </p>
-                      <PageSizeControl
-                        value={verificationPageSize}
-                        onChange={(value) => {
-                          setVerificationPageSize(value);
-                          setCurrentVerificationPage(1);
-                        }}
-                      />
-                    </div>
+                  <div className="flex justify-end">
                     <Pagination
                       page={currentVerificationPage}
                       totalPages={totalVerificationPages}

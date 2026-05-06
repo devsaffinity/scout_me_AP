@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { createElement, useEffect, useMemo, useRef, useState } from 'react';
 import { FiCheck, FiChevronDown, FiCompass, FiEye, FiFilter, FiSearch, FiStar, FiTrendingUp } from 'react-icons/fi';
 import DiscoveryTrendChart from '../../components/discoveryEngagement/discovery/DiscoveryTrendChart';
 import SurfacePerformanceChart from '../../components/discoveryEngagement/discovery/SurfacePerformanceChart';
@@ -111,7 +111,6 @@ const rangeDiscoveryScores = {
 };
 
 const defaultEngagementEventsPageSize = 2;
-const pageSizeOptions = [2, 3, 4, 6];
 
 const summaryCards = [
   {
@@ -165,7 +164,7 @@ const useCountUp = (target) => {
   return value;
 };
 
-const SummaryCard = ({ title, value, icon: Icon, accent, hint }) => {
+const SummaryCard = ({ title, value, icon, accent, hint }) => {
   const animatedValue = useCountUp(value);
 
   return (
@@ -177,36 +176,19 @@ const SummaryCard = ({ title, value, icon: Icon, accent, hint }) => {
           <p className="mt-2 text-sm text-slate-500">{hint}</p>
         </div>
         <div className={`rounded-2xl ${accent} p-3 text-xl text-white`}>
-          <Icon />
+          {createElement(icon)}
         </div>
       </div>
     </div>
   );
 };
 
-const PageSizeControl = ({ value, onChange }) => (
-  <label className="flex items-center gap-2 text-sm text-slate-500">
-    <span>Rows per page</span>
-    <select
-      value={value}
-      onChange={(event) => onChange(Number(event.target.value))}
-      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400"
-    >
-      {pageSizeOptions.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  </label>
-);
-
 const DiscoveryEngagementPage = () => {
   const [query, setQuery] = useState('');
   const [range, setRange] = useState('30 days');
   const [rangeMenuOpen, setRangeMenuOpen] = useState(false);
   const [currentEventsPage, setCurrentEventsPage] = useState(1);
-  const [eventsPageSize, setEventsPageSize] = useState(defaultEngagementEventsPageSize);
+  const eventsPageSize = defaultEngagementEventsPageSize;
   const rangeMenuRef = useRef(null);
 
   useEffect(() => {
@@ -298,8 +280,8 @@ const DiscoveryEngagementPage = () => {
   }, [normalizedQuery]);
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1600px] space-y-6">
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-full space-y-5 2xl:space-y-6">
         <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-[0_20px_70px_rgba(15,23,42,0.06)]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -321,7 +303,7 @@ const DiscoveryEngagementPage = () => {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   type="text"
-                  placeholder="Search surfaces, profiles, or events"
+                  placeholder="Search surfaces,profiles"
                   className="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:bg-white"
                 />
               </div>
@@ -388,7 +370,7 @@ const DiscoveryEngagementPage = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-5 2xl:grid-cols-2 2xl:gap-6">
           <DiscoveryTrendChart
             data={selectedTrendData}
             subtitle={`Profile views, saves, and follow behavior over the selected ${range.toLowerCase()} window.`}
@@ -405,7 +387,7 @@ const DiscoveryEngagementPage = () => {
                 <h2 className="text-lg font-semibold text-slate-950">Surface performance</h2>
                 <p className="mt-1 text-sm text-slate-500">Which channels generate the most discovery traffic in the selected range.</p>
               </div>
-              <div className="grid h-[320px] place-items-center rounded-[22px] border border-dashed border-slate-200 bg-slate-50 px-6 text-center">
+              <div className="grid h-[280px] place-items-center rounded-[22px] border border-dashed border-slate-200 bg-slate-50 px-6 text-center 2xl:h-[320px]">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">No surfaces matched this search</p>
                     <p className="mt-1 text-sm text-slate-500">Try a broader term to see channel performance again.</p>
@@ -415,13 +397,13 @@ const DiscoveryEngagementPage = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1.15fr]">
+        <div className="grid grid-cols-1 items-start gap-5 2xl:grid-cols-[1fr_1.15fr] 2xl:gap-6">
           <section className={cardClass}>
             <div className="mb-4">
               <h2 className="text-lg font-semibold text-slate-950">Hotspot profiles</h2>
               <p className="mt-1 text-sm text-slate-500">Accounts showing unusually strong discovery momentum.</p>
             </div>
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+            <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-2">
               {filteredHotspotProfiles.length ? (
                 filteredHotspotProfiles.map((item) => (
                   <article key={item.name} className="flex h-full flex-col rounded-[22px] border border-slate-200 bg-slate-50 p-4">
@@ -448,7 +430,7 @@ const DiscoveryEngagementPage = () => {
                   </article>
                 ))
               ) : (
-                <div className="rounded-[22px] border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center md:col-span-2 xl:col-span-1 2xl:col-span-2">
+                <div className="rounded-[22px] border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center md:col-span-2">
                   <p className="text-base font-semibold text-slate-900">No hotspot profiles matched</p>
                   <p className="mt-2 text-sm text-slate-500">Clear the search to review the full momentum list again.</p>
                 </div>
@@ -506,21 +488,7 @@ const DiscoveryEngagementPage = () => {
             </div>
             {filteredEngagementEvents.length ? (
               <div className="mt-4 border-t border-slate-200 pt-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <p className="text-sm text-slate-500">
-                      Showing {(currentEventsPage - 1) * eventsPageSize + 1}
-                      -
-                      {Math.min(currentEventsPage * eventsPageSize, filteredEngagementEvents.length)} of {filteredEngagementEvents.length} events
-                    </p>
-                    <PageSizeControl
-                      value={eventsPageSize}
-                      onChange={(value) => {
-                        setEventsPageSize(value);
-                        setCurrentEventsPage(1);
-                      }}
-                    />
-                  </div>
+                <div className="flex justify-end">
                   <Pagination page={currentEventsPage} totalPages={totalEventsPages} onPageChange={setCurrentEventsPage} />
                 </div>
               </div>

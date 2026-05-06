@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { createElement, useEffect, useMemo, useState } from 'react';
 import { FiCreditCard, FiRadio, FiRepeat, FiTrendingUp } from 'react-icons/fi';
 import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
 import Pagination from '../../components/shared/Pagination';
@@ -40,7 +40,6 @@ const cardClass =
 const defaultPlansPageSize = 2;
 const defaultInventoryPageSize = 2;
 const defaultScansPageSize = 2;
-const pageSizeOptions = [2, 3, 4, 6];
 const PLANS_STORAGE_KEY = 'scoutme_admin_premium_plans';
 const INVENTORY_STORAGE_KEY = 'scoutme_admin_premium_inventory';
 const SCANS_STORAGE_KEY = 'scoutme_admin_premium_scans';
@@ -79,7 +78,7 @@ const useCountUp = (target) => {
   return value;
 };
 
-const MetricCard = ({ title, value, icon: Icon, accent, hint, suffix = '' }) => {
+const MetricCard = ({ title, value, icon, accent, hint, suffix = '' }) => {
   const animatedValue = useCountUp(value);
 
   return (
@@ -94,29 +93,12 @@ const MetricCard = ({ title, value, icon: Icon, accent, hint, suffix = '' }) => 
           <p className="mt-2 text-sm text-slate-500">{hint}</p>
         </div>
         <div className={`rounded-2xl ${accent} p-3 text-xl text-white`}>
-          <Icon />
+          {createElement(icon)}
         </div>
       </div>
     </div>
   );
 };
-
-const PageSizeControl = ({ value, onChange }) => (
-  <label className="flex items-center gap-2 text-sm text-slate-500">
-    <span>Rows per page</span>
-    <select
-      value={value}
-      onChange={(event) => onChange(Number(event.target.value))}
-      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400"
-    >
-      {pageSizeOptions.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  </label>
-);
 
 const statusStyles = {
   live: 'bg-emerald-100 text-emerald-700',
@@ -142,9 +124,9 @@ const PremiumNfcPage = () => {
   const [currentPlansPage, setCurrentPlansPage] = useState(1);
   const [currentInventoryPage, setCurrentInventoryPage] = useState(1);
   const [currentScansPage, setCurrentScansPage] = useState(1);
-  const [plansPageSize, setPlansPageSize] = useState(defaultPlansPageSize);
-  const [inventoryPageSize, setInventoryPageSize] = useState(defaultInventoryPageSize);
-  const [scansPageSize, setScansPageSize] = useState(defaultScansPageSize);
+  const plansPageSize = defaultPlansPageSize;
+  const inventoryPageSize = defaultInventoryPageSize;
+  const scansPageSize = defaultScansPageSize;
 
   const totalPlansPages = Math.max(1, Math.ceil(planItems.length / plansPageSize));
   const paginatedPlans = useMemo(() => {
@@ -225,8 +207,8 @@ const PremiumNfcPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1600px] space-y-6">
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-full space-y-5 2xl:space-y-6">
         <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-[0_20px_70px_rgba(15,23,42,0.06)]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -400,13 +382,13 @@ const PremiumNfcPage = () => {
           <MetricCard title="Successful scans" value={18440} icon={FiTrendingUp} accent="bg-violet-600" hint="Tap events linked to discovery or access." />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.2fr_1fr]">
+        <div className="grid grid-cols-1 items-start gap-5 2xl:grid-cols-[1.2fr_1fr] 2xl:gap-6">
           <section className={cardClass}>
             <div className="mb-4">
               <h2 className="text-lg font-semibold text-slate-950">Subscription momentum</h2>
               <p className="mt-1 text-sm text-slate-500">Active users, renewals, and churn over the last six months.</p>
             </div>
-            <div className="h-[320px] w-full">
+            <div className="h-[280px] w-full 2xl:h-[320px]">
               <AreaChart data={subscriptionTrend} responsive style={{ width: '100%', height: '100%' }}>
                 <defs>
                   <linearGradient id="premiumActiveFill" x1="0" y1="0" x2="0" y2="1">
@@ -420,8 +402,14 @@ const PremiumNfcPage = () => {
                 </defs>
                 <CartesianGrid vertical={false} stroke="#e2e8f0" strokeDasharray="4 4" />
                 <XAxis dataKey="month" tickLine={false} axisLine={false} />
-                <YAxis tickLine={false} axisLine={false} width={50} />
-                <Tooltip />
+                <YAxis tickLine={false} axisLine={false} width={60} tickMargin={10} />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 16,
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 20px 40px rgba(15, 23, 42, 0.12)',
+                  }}
+                />
                 <Area type="monotone" dataKey="active" stroke="#0f172a" fill="url(#premiumActiveFill)" strokeWidth={3} />
                 <Area type="monotone" dataKey="renewals" stroke="#2563eb" fill="url(#renewalsFill)" strokeWidth={3} />
               </AreaChart>
@@ -448,28 +436,14 @@ const PremiumNfcPage = () => {
               ))}
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="text-sm text-slate-500">
-                    Showing {(currentPlansPage - 1) * plansPageSize + 1}
-                    -
-                    {Math.min(currentPlansPage * plansPageSize, planItems.length)} of {planItems.length} plans
-                  </p>
-                  <PageSizeControl
-                    value={plansPageSize}
-                    onChange={(value) => {
-                      setPlansPageSize(value);
-                      setCurrentPlansPage(1);
-                    }}
-                  />
-                </div>
+              <div className="flex justify-end">
                 <Pagination page={currentPlansPage} totalPages={totalPlansPages} onPageChange={setCurrentPlansPage} />
               </div>
             </div>
           </section>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1.15fr]">
+        <div className="grid grid-cols-1 items-start gap-5 2xl:grid-cols-[1fr_1.15fr] 2xl:gap-6">
           <section className={cardClass}>
             <div className="mb-4">
               <h2 className="text-lg font-semibold text-slate-950">Bracelet inventory</h2>
@@ -490,21 +464,7 @@ const PremiumNfcPage = () => {
               ))}
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="text-sm text-slate-500">
-                    Showing {(currentInventoryPage - 1) * inventoryPageSize + 1}
-                    -
-                    {Math.min(currentInventoryPage * inventoryPageSize, inventoryItems.length)} of {inventoryItems.length} bracelets
-                  </p>
-                  <PageSizeControl
-                    value={inventoryPageSize}
-                    onChange={(value) => {
-                      setInventoryPageSize(value);
-                      setCurrentInventoryPage(1);
-                    }}
-                  />
-                </div>
+              <div className="flex justify-end">
                 <Pagination
                   page={currentInventoryPage}
                   totalPages={totalInventoryPages}
@@ -544,21 +504,7 @@ const PremiumNfcPage = () => {
               </div>
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="text-sm text-slate-500">
-                    Showing {(currentScansPage - 1) * scansPageSize + 1}
-                    -
-                    {Math.min(currentScansPage * scansPageSize, scanItems.length)} of {scanItems.length} scans
-                  </p>
-                  <PageSizeControl
-                    value={scansPageSize}
-                    onChange={(value) => {
-                      setScansPageSize(value);
-                      setCurrentScansPage(1);
-                    }}
-                  />
-                </div>
+              <div className="flex justify-end">
                 <Pagination page={currentScansPage} totalPages={totalScansPages} onPageChange={setCurrentScansPage} />
               </div>
             </div>

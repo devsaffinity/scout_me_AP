@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { createElement, useEffect, useMemo, useState } from 'react';
 import {
   FiActivity,
   FiCalendar,
@@ -324,7 +324,7 @@ const AnimatedNumber = ({ value, prefix = '', suffix = '' }) => {
   );
 };
 
-const MetricCard = ({ title, value, hint, icon: Icon, accent }) => {
+const MetricCard = ({ title, value, hint, icon, accent }) => {
   return (
     <div className={`${cardClass} overflow-hidden`}>
       <div className="flex items-start justify-between gap-4">
@@ -336,7 +336,7 @@ const MetricCard = ({ title, value, hint, icon: Icon, accent }) => {
           <p className="text-sm text-slate-500">{hint}</p>
         </div>
         <div className={`rounded-2xl ${accent} p-3 text-xl text-white shadow-lg`}>
-          <Icon />
+          {createElement(icon)}
         </div>
       </div>
     </div>
@@ -491,9 +491,9 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1600px] space-y-6">
-        <div className="grid gap-5 rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-[0_20px_70px_rgba(15,23,42,0.06)] xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-full space-y-5 2xl:space-y-6">
+        <div className="grid gap-5 rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-[0_20px_70px_rgba(15,23,42,0.06)] 2xl:grid-cols-[minmax(0,1fr)_auto] 2xl:items-start">
           <div className="min-w-0 space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
               <FiCalendar />
@@ -559,7 +559,7 @@ const DashboardPage = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.55fr_1fr]">
+        <div className="grid grid-cols-1 items-start gap-5 2xl:grid-cols-[1.55fr_1fr] 2xl:gap-6">
           <PlatformGrowthChart
             data={currentData.growthData}
             subtitle={`Athlete and recruiter acquisition with total match acceleration for the last ${activeRange.toLowerCase()}.`}
@@ -568,7 +568,7 @@ const DashboardPage = () => {
           <UserRoleDistributionChart data={currentData.roleDistribution} />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2 2xl:gap-6">
           <DiscoveryActivityChart
             data={currentData.discoveryActivity}
             subtitle={`High-intent engagement signals across profile browsing surfaces in the last ${activeRange.toLowerCase()}.`}

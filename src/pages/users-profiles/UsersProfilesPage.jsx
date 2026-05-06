@@ -205,18 +205,20 @@ const MetricCard = ({ title, value, icon, accent, hint }) => {
 };
 
 const StatusPill = ({ status }) => (
-  <span
-    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${
-      status === 'active'
-        ? 'bg-emerald-100 text-emerald-700'
-        : status === 'review'
-          ? 'bg-amber-100 text-amber-700'
-          : status === 'flagged' || status === 'suspended'
-            ? 'bg-rose-100 text-rose-700'
-            : 'bg-slate-100 text-slate-700'
-    }`}
-  >
-    {status}
+  <span className="flex justify-start">
+    <span
+      className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold capitalize ${
+        status === 'active'
+          ? 'bg-emerald-100 text-emerald-700'
+          : status === 'review'
+            ? 'bg-amber-100 text-amber-700'
+            : status === 'flagged' || status === 'suspended'
+              ? 'bg-rose-100 text-rose-700'
+              : 'bg-slate-100 text-slate-700'
+      }`}
+    >
+      {status}
+    </span>
   </span>
 );
 
@@ -313,46 +315,25 @@ const UsersProfilesPage = () => {
   }, [query, verificationRequests]);
 
   const totalAthletesPages = Math.max(1, Math.ceil(filteredAthletes.length / athletesPageSize));
+  const safeAthletesPage = Math.min(currentAthletesPage, totalAthletesPages);
   const paginatedAthletes = useMemo(() => {
-    const startIndex = (currentAthletesPage - 1) * athletesPageSize;
+    const startIndex = (safeAthletesPage - 1) * athletesPageSize;
     return filteredAthletes.slice(startIndex, startIndex + athletesPageSize);
-  }, [athletesPageSize, currentAthletesPage, filteredAthletes]);
+  }, [athletesPageSize, filteredAthletes, safeAthletesPage]);
 
   const totalRecruitersPages = Math.max(1, Math.ceil(filteredRecruiters.length / recruitersPageSize));
+  const safeRecruitersPage = Math.min(currentRecruitersPage, totalRecruitersPages);
   const paginatedRecruiters = useMemo(() => {
-    const startIndex = (currentRecruitersPage - 1) * recruitersPageSize;
+    const startIndex = (safeRecruitersPage - 1) * recruitersPageSize;
     return filteredRecruiters.slice(startIndex, startIndex + recruitersPageSize);
-  }, [currentRecruitersPage, filteredRecruiters, recruitersPageSize]);
+  }, [filteredRecruiters, recruitersPageSize, safeRecruitersPage]);
 
   const totalVerificationPages = Math.max(1, Math.ceil(filteredVerificationRequests.length / verificationPageSize));
+  const safeVerificationPage = Math.min(currentVerificationPage, totalVerificationPages);
   const paginatedVerificationRequests = useMemo(() => {
-    const startIndex = (currentVerificationPage - 1) * verificationPageSize;
+    const startIndex = (safeVerificationPage - 1) * verificationPageSize;
     return filteredVerificationRequests.slice(startIndex, startIndex + verificationPageSize);
-  }, [currentVerificationPage, filteredVerificationRequests, verificationPageSize]);
-
-  useEffect(() => {
-    setCurrentAthletesPage(1);
-    setCurrentRecruitersPage(1);
-    setCurrentVerificationPage(1);
-  }, [query, statusFilter]);
-
-  useEffect(() => {
-    if (currentAthletesPage > totalAthletesPages) {
-      setCurrentAthletesPage(totalAthletesPages);
-    }
-  }, [currentAthletesPage, totalAthletesPages]);
-
-  useEffect(() => {
-    if (currentRecruitersPage > totalRecruitersPages) {
-      setCurrentRecruitersPage(totalRecruitersPages);
-    }
-  }, [currentRecruitersPage, totalRecruitersPages]);
-
-  useEffect(() => {
-    if (currentVerificationPage > totalVerificationPages) {
-      setCurrentVerificationPage(totalVerificationPages);
-    }
-  }, [currentVerificationPage, totalVerificationPages]);
+  }, [filteredVerificationRequests, safeVerificationPage, verificationPageSize]);
 
   const handleApproveVerification = ({ request }) => {
     setVerificationRequests((current) => current.filter((item) => item.id !== request?.id));
@@ -399,7 +380,12 @@ const UsersProfilesPage = () => {
                 <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   value={query}
-                  onChange={(event) => setQuery(event.target.value)}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setCurrentAthletesPage(1);
+                    setCurrentRecruitersPage(1);
+                    setCurrentVerificationPage(1);
+                  }}
                   type="text"
                   placeholder="Search users or orgs"
                   className="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:bg-white"
@@ -432,6 +418,9 @@ const UsersProfilesPage = () => {
                           type="button"
                           onClick={() => {
                             setStatusFilter(option.value);
+                            setCurrentAthletesPage(1);
+                            setCurrentRecruitersPage(1);
+                            setCurrentVerificationPage(1);
                             setStatusMenuOpen(false);
                           }}
                           className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition ${
@@ -509,8 +498,10 @@ const UsersProfilesPage = () => {
                           </div>
                         </div>
                         <StatusPill status={athlete.status} />
-                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${athlete.verified ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                          {athlete.verified ? 'Verified' : 'Pending'}
+                        <span className="flex justify-start">
+                          <span className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${athlete.verified ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                            {athlete.verified ? 'Verified' : 'Pending'}
+                          </span>
                         </span>
                       </div>
                     ))}
@@ -520,7 +511,7 @@ const UsersProfilesPage = () => {
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
               <div className="flex justify-end">
-                <Pagination page={currentAthletesPage} totalPages={totalAthletesPages} onPageChange={setCurrentAthletesPage} />
+                <Pagination page={safeAthletesPage} totalPages={totalAthletesPages} onPageChange={setCurrentAthletesPage} />
               </div>
             </div>
           </section>
@@ -566,7 +557,7 @@ const UsersProfilesPage = () => {
             </div>
             <div className="mt-4 border-t border-slate-200 pt-4">
               <div className="flex justify-end">
-                <Pagination page={currentRecruitersPage} totalPages={totalRecruitersPages} onPageChange={setCurrentRecruitersPage} />
+                <Pagination page={safeRecruitersPage} totalPages={totalRecruitersPages} onPageChange={setCurrentRecruitersPage} />
               </div>
             </div>
           </section>
@@ -628,7 +619,7 @@ const UsersProfilesPage = () => {
                 <div className="mt-4 border-t border-slate-200 pt-4">
                   <div className="flex justify-end">
                     <Pagination
-                      page={currentVerificationPage}
+                      page={safeVerificationPage}
                       totalPages={totalVerificationPages}
                       onPageChange={setCurrentVerificationPage}
                     />

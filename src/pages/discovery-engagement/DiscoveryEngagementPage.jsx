@@ -261,23 +261,14 @@ const DiscoveryEngagementPage = () => {
     [normalizedQuery],
   );
   const totalEventsPages = Math.max(1, Math.ceil(filteredEngagementEvents.length / eventsPageSize));
+  const safeEventsPage = Math.min(currentEventsPage, totalEventsPages);
   const paginatedEngagementEvents = useMemo(() => {
-    const startIndex = (currentEventsPage - 1) * eventsPageSize;
+    const startIndex = (safeEventsPage - 1) * eventsPageSize;
     return filteredEngagementEvents.slice(startIndex, startIndex + eventsPageSize);
-  }, [currentEventsPage, eventsPageSize, filteredEngagementEvents]);
+  }, [eventsPageSize, filteredEngagementEvents, safeEventsPage]);
 
   const totalMatches =
     filteredChannelPerformance.length + filteredHotspotProfiles.length + filteredEngagementEvents.length;
-
-  useEffect(() => {
-    if (currentEventsPage > totalEventsPages) {
-      setCurrentEventsPage(totalEventsPages);
-    }
-  }, [currentEventsPage, totalEventsPages]);
-
-  useEffect(() => {
-    setCurrentEventsPage(1);
-  }, [normalizedQuery]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -301,7 +292,10 @@ const DiscoveryEngagementPage = () => {
                 <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   value={query}
-                  onChange={(event) => setQuery(event.target.value)}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setCurrentEventsPage(1);
+                  }}
                   type="text"
                   placeholder="Search surfaces,profiles"
                   className="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:bg-white"
@@ -462,18 +456,20 @@ const DiscoveryEngagementPage = () => {
                           </div>
                           <p className="text-sm text-slate-700">{event.detail}</p>
                           <p className="text-sm text-slate-700">{event.result}</p>
-                          <span
-                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${
-                              event.status === 'high intent'
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : event.status === 'top performer'
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : event.status === 'growing'
-                                    ? 'bg-violet-100 text-violet-700'
-                                    : 'bg-amber-100 text-amber-700'
-                            }`}
-                          >
-                            {event.status}
+                          <span className="flex justify-start">
+                            <span
+                              className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold capitalize ${
+                                event.status === 'high intent'
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : event.status === 'top performer'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : event.status === 'growing'
+                                      ? 'bg-violet-100 text-violet-700'
+                                      : 'bg-amber-100 text-amber-700'
+                              }`}
+                            >
+                              {event.status}
+                            </span>
                           </span>
                         </div>
                       ))
@@ -489,7 +485,7 @@ const DiscoveryEngagementPage = () => {
             {filteredEngagementEvents.length ? (
               <div className="mt-4 border-t border-slate-200 pt-4">
                 <div className="flex justify-end">
-                  <Pagination page={currentEventsPage} totalPages={totalEventsPages} onPageChange={setCurrentEventsPage} />
+                  <Pagination page={safeEventsPage} totalPages={totalEventsPages} onPageChange={setCurrentEventsPage} />
                 </div>
               </div>
             ) : null}
